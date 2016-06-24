@@ -1,0 +1,30 @@
+general:
+  artifacts:
+    - "pkg"
+
+machine:
+  services:
+    - docker
+
+dependencies:
+  pre:
+    - make docker-deps
+
+test:
+  override:
+    - make all
+
+deployment:
+  dev:
+    branch:
+      - stage
+      - yolo
+      - dev
+    commands:
+      - gem install package_cloud
+      - bash scripts/push_packagecloud.sh internal-staging
+  prod:
+    branch: master
+    commands:
+      - gem install package_cloud
+      - bash scripts/push_packagecloud.sh internal

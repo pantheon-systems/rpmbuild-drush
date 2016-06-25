@@ -57,13 +57,12 @@ for ver in $BUILD_VERSIONS; do
     fi
 
     read docker_cmd <<-EOL
-      $docker run $RUN_ARGS \
-        -e "build=$CIRCLE_BUILD_NUM" \
-        -w $inner_mount \
-        -v $bin/../:$inner_mount \
-        $build_image $exec_cmd
+          $docker run $RUN_ARGS \
+          -e "build=$CIRCLE_BUILD_NUM" \
+          -w $inner_mount \
+          -v $bin/../:$inner_mount \
+          $build_image $exec_cmd
 EOL
-
 
     echo "Running: $docker_cmd"
     $docker_cmd

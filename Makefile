@@ -41,3 +41,7 @@ rpm:
 .PHONY: rpm-with-native-tools
 rpm-with-native-tools: fpm_deps
 	sh scripts/dockerless.sh
+
+clean:
+	rm -r -rf build*
+	rm -r -rf pkg

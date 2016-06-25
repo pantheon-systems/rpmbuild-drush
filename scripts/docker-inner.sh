@@ -9,6 +9,12 @@ if [ "$#" -lt 4 ]; then
   exit 1
 fi
 
+curl -L -f https://getcomposer.org/composer.phar --output $bin/composer.phar
+chmod +x $bin/composer.phar
+yum install php5-common libapache2-mod-php5 php5-cli
+php $bin/composer.phar
+
+channel=$1
 rpm_dir=$2
 build=$3
 epoch=$4
@@ -23,22 +29,20 @@ shortname="drush"
 target_dir="$rpm_dir/$fedora_release/drush"
 versions=$(cat $bin/../VERSIONS.txt | grep -v '^#')
 
-for version in $versions; do
-    channel=${version%%.*}
-    name="$shortname-$channel"
+for version in $versions;
+do(
+    releasenum=${version%%.*}
+    name="$shortname-$releasenum"
     iteration=${epoch}
     arch='x86_64'
     url="https://github.com/pantheon-systems/${shortname}"
     vendor='Pantheon'
     description='drush: Pantheon rpm containing commandline tool for Drupal'
-    install_prefix="/opt/pantheon/$shortname"
-    download_dir="$bin/../build$channel"
-
-    GITSHA=$(git log -1 --format="%h")
-    iteration=${iteration}.${GITSHA}
+    install_prefix="/opt/pantheon/$name"
+    download_dir="$bin/../build$releasenum"
 
     # Add the git SHA hash to the rpm build if the local working copy is clean
-    if [ -z "$(git status --porcelain)" ]
+    if [ -z "$(git diff-index --quiet HEAD --)" ]
     then
         GITSHA=$(git log -1 --format="%h")
         iteration=${iteration}.${GITSHA}
@@ -60,18 +64,18 @@ for version in $versions; do
 
     git clone https://github.com/drush-ops/drush.git $download_dir/$name
     [ $? == 0 ] || (echo "Git repository could not be cloned!"; exit 1)
-    
+
     cd $download_dir/$name
     composer install
     [ $? == 0 ] || (echo "Install failed!"; exit 1)
-    cd -
-
-    mkdir -p "$target_dir"
-    
     cd $download_dir
 
+    mkdir -p "$target_dir"
+
+    cd $target_dir
+
     fpm -s dir -t rpm  \
-        --package "$target_dir/${name}-${version}-${iteration}.${arch}.rpm" \
+        --package "$target_dir/${name}-release-${version}-${iteration}.${arch}.rpm" \
         --name "${name}" \
         --version "${version}" \
         --iteration "${iteration}" \
@@ -83,7 +87,10 @@ for version in $versions; do
         --prefix "$install_prefix" \
         -C /$download_dir \
         $name
-    done
 
-# Finish up by running our tests.
-$bin/../tests/confirm-rpm.sh $fedora_release
+    # Finish up by running our tests.
+    cd ..
+    cd ..
+    cd ..
+    $bin/../tests/confirm-rpm.sh $fedora_release $name)
+    done

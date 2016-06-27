@@ -33,10 +33,8 @@ versions=$(cat $bin/../VERSIONS.txt | grep -v '^#')
 
 for version in $versions; do(
 
-	if [[ $version == "6-2-remove-uname" ]] || [[ $version == "5-10-production" ]]
-	then
-		version=$(echo $version | sed -e 's/\([^-]*\)-\([^-]*\)-.*/\1.\2.0/')
-	fi
+	version_untampered=$version
+	version=$(echo $version | sed -e 's/\([^-]*\)-\([^-]*\)-\(.*\)/\1.\2.0\-\3/')
 
 	releasenum=${version%%.*}
 	releasever=${version%.*}
@@ -78,14 +76,13 @@ for version in $versions; do(
 
 	git clone $git_dir $download_dir
 	cd $download_dir
-	git checkout $version
+	git checkout $version_untampered
 
 	[ -f composer.json ] && composer install
 
 	cd -
 
 	mkdir -p "$target_dir"
-
 
 	fpm -s dir -t rpm	 \
 		--package "$target_dir/${expname}-release-${version}-${iteration}.${arch}.rpm" \

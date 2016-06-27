@@ -1,13 +1,10 @@
 #!/bin/bash
 # confirm-rpm.sh
 
-fedora_release=$1
+drush_version=$1
 
-expectedName=drush-
-expectedContents=/opt/pantheon/drush-0.x/drush.phar
-pkgDir="pkg/$fedora_release/drush"
-
-: <<'END'
+expectedName=drush
+pkgDir="pkgs/$drush_version"
 
 if [ ! -d "$pkgDir" ]
 then
@@ -15,15 +12,13 @@ then
   exit 1
 fi
 
-rpmName=$(ls "$pkgDir")
+rpmName=$(ls $pkgDir | grep $drush_version)
 
 if [ -z "$rpmName" ]
 then
   echo 'No build found.'
   exit 1
 fi
-
-END
 
 echo
 echo "RPM info:"
@@ -36,10 +31,8 @@ echo "-------------------------------"
 rpm -qpl "$pkgDir/$rpmName"
 echo
 
-: <<'END'
-
 name=$(rpm -qp --queryformat '%{NAME}\n' "$pkgDir/$rpmName")
-if [ "$(echo "$name" | sed -e 's/-[a-z]*$//')" != "$expectedName" ]
+if [ "$(echo "$name" | sed -e 's/-[a-z0-9]*$//')" != "$expectedName" ]
 then
   echo "Name is not $expectedName"
   exit 1
@@ -65,7 +58,6 @@ then
   exit 1
 fi
 
-
 # This semver regex just ignores the pre-release section without validating it
 version=$(rpm -qp --queryformat '%{VERSION}\n' "$pkgDir/$rpmName")
 if [ -z "$(echo "$version" | grep '^[0-9]\+\.[0-9]\+\.[0-9]\+')" ]
@@ -75,15 +67,11 @@ then
 fi
 
 contents=$(rpm -qpl "$pkgDir/$rpmName")
-if [ "$contents" != "$expectedContents" ]
+if [ -z "$(echo "$contents" | grep '/opt/pantheon/drush-[0-9]/drush')" ]
 then
-  echo "RPM contents do not match expected value:"
-  echo $expectedContents
+  echo "RPM contents not correct"
   exit 1
 fi
 
-END
-
 echo 'Basic rpm validation checks all passed.'
 exit 0
-

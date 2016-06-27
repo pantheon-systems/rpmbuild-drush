@@ -1,14 +1,12 @@
-general:
-  artifacts:
-    - "pkg"
-
+---
 machine:
-  services:
-    - docker
-
+  php:
+    version: 7.0.4
+    
 dependencies:
   pre:
-    - make docker-deps
+    - make deps
+    - make deps-circle
 
 test:
   override:
@@ -21,10 +19,8 @@ deployment:
       - yolo
       - dev
     commands:
-      - gem install package_cloud
       - bash scripts/push_packagecloud.sh internal-staging
   prod:
     branch: master
     commands:
-      - gem install package_cloud
       - bash scripts/push_packagecloud.sh internal

@@ -1,43 +1,26 @@
 # Read the version we are packaging from VERSIONS.txt
 VERSION := $(shell cat VERSIONS.txt)
 
-.PHONY: all
 all: rpm
 
-.PHONY: test
-test: rpm_deps
+test: deps
 	tests/confirm-rpm.sh
 
-.PHONY: deps
-deps: fpm_deps
+deps:
+	gem install fpm
 
-.PHONY: with-native-tools
-with-native-tools: rpm-with-native-tools
+deps-macos:
+	brew install rpm
 
-.PHONY: docker-deps
-docker-deps:
+deps-circle:
+	sudo apt-get -y install rpm
+	gem install package_cloud
 
-.PHONY: rate_limit
-rate_limit:
-	curl -H "Authorization: token $$GITHUB_TOKEN" -XGET https://api.github.com/rate_limit
-
-.PHONY: validate_circle
-validate_circle:
-	ruby -r yaml -e 'puts YAML.dump(STDIN.read)' < circle.yml
-
-.PHONY: rpm_deps
-rpm_deps:
-	-which rpm &>/dev/null || (which apt-get &>/dev/null && sudo apt-get install rpm)
-	-which rpm &>/dev/null || (which brew &>/dev/null && brew install rpm)
-
-.PHONY: fpm_deps
-fpm_deps: rpm_deps
-	-which fpm &>/dev/null || gem install fpm
-
-.PHONY: rpm
 rpm:
-	sh scripts/docker-outer.sh
+	bash scripts/build-rpm.sh
 
-.PHONY: rpm-with-native-tools
-rpm-with-native-tools: fpm_deps
-	sh scripts/dockerless.sh
+clean:
+	rm -rf build*
+	rm -rf pkgs
+
+.PHONY: all

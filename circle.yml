@@ -2,7 +2,9 @@
 machine:
   php:
     version: 7.0.4
-    
+  ruby:
+    version: 2.0.0
+
 dependencies:
   pre:
     - make deps

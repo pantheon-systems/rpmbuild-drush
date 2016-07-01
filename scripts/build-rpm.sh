@@ -32,6 +32,10 @@ description='drush: Pantheon rpm containing commandline tool for Drupal'
 versions=$(cat $bin/../VERSIONS.txt | grep -v '^#')
 
 for version in $versions; do(
+
+	version_untampered=$version
+	version=$(echo $version | sed -e 's/\([^-]*\)-\([^-]*\)-\(.*\)/\1.\2.0\-\3/')
+
 	releasenum=${version%%.*}
 	releasever=${version%.*}
 	name="$shortname-$releasenum"
@@ -63,15 +67,22 @@ for version in $versions; do(
 	rm -rf $download_dir
 	mkdir -p $download_dir
 
-	git clone https://github.com/drush-ops/drush.git $download_dir
-	cd $download_dir
+	if [ $releasenum -le "6" ]
+	then
+		git_dir="https://github.com/pantheon-systems/drush.git"
+	else
+		git_dir="https://github.com/drush-ops/drush.git"
+	fi
 
-	composer install
+	git clone $git_dir $download_dir
+	cd $download_dir
+	git checkout $version_untampered
+
+	[ -f composer.json ] && composer install
 
 	cd -
 
 	mkdir -p "$target_dir"
-
 
 	fpm -s dir -t rpm	 \
 		--package "$target_dir/${expname}-release-${version}-${iteration}.${arch}.rpm" \

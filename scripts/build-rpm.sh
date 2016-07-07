@@ -40,7 +40,7 @@ for version in $versions; do(
 	releasever=${version%.*}
 	name="$shortname-$releasenum"
 	expname="$shortname-$releasever"
-	iteration="$epoch"
+	iteration="$(date +%Y%m%d%H%M)"
 	url="https://github.com/pantheon-systems/${shortname}"
 	install_prefix="/opt/pantheon/$name"
 	download_dir="$bin/../builds/$name"

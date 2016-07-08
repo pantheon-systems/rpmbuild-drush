@@ -96,7 +96,7 @@ for version in $versions; do(
 		--description "${description}" \
 		--prefix "$install_prefix" \
 		-C $download_dir \
-		$shortname
+		$(ls $download_dir)
 
 	# Finish up by running our tests.
 	sh $bin/../tests/confirm-rpm.sh $name

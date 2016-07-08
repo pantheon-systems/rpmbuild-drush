@@ -25,7 +25,7 @@ case $CIRCLE_BRANCH in
 esac
 
 shortname="drush"
-arch='x86_64'
+arch='noarch'
 vendor='Pantheon'
 description='drush: Pantheon rpm containing commandline tool for Drupal'
 
@@ -37,9 +37,7 @@ for version in $versions; do(
 	version=$(echo $version | sed -e 's/\([^-]*\)-\([^-]*\)-\(.*\)/\1.\2.0\-\3/')
 
 	releasenum=${version%%.*}
-	releasever=${version%.*}
-	name="$shortname-$releasenum"
-	expname="$shortname-$releasever"
+	name="$shortname$releasenum"
 	iteration="$(date +%Y%m%d%H%M)"
 	url="https://github.com/pantheon-systems/${shortname}"
 	install_prefix="/opt/pantheon/$name"
@@ -50,7 +48,7 @@ for version in $versions; do(
 	if [ -z "$(git diff-index --quiet HEAD --)" ]
 	then
 		GITSHA=$(git log -1 --format="%h")
-		iteration=${iteration}.${GITSHA}
+		iteration=${iteration}.git${GITSHA}
 	else
 		# Allow non-clean builds in dev mode; for anything else, fail if there
 		# are uncommitted changes.
@@ -85,7 +83,7 @@ for version in $versions; do(
 	mkdir -p "$target_dir"
 
 	fpm -s dir -t rpm	 \
-		--package "$target_dir/${expname}-release-${version}-${iteration}.${arch}.rpm" \
+		--package "$target_dir/${name}-${version}-${iteration}.${arch}.rpm" \
 		--name "${name}" \
 		--version "${version}" \
 		--iteration "${iteration}" \

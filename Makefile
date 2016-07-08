@@ -1,7 +1,7 @@
 # Read the version we are packaging from VERSIONS.txt
 VERSION := $(shell cat VERSIONS.txt)
 
-all: rpm
+all: clean rpm
 
 test: deps
 	tests/confirm-rpm.sh

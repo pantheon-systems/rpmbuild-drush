@@ -32,7 +32,7 @@ rpm -qpl "$pkgDir/$rpmName"
 echo
 
 name=$(rpm -qp --queryformat '%{NAME}\n' "$pkgDir/$rpmName")
-if [ "$(echo "$name" | sed -e 's/-[a-z0-9]*$//')" != "$expectedName" ]
+if [ "$(echo "$name" | sed -e 's/[0-9]*$//')" != "$expectedName" ]
 then
   echo "Name is not $expectedName"
   exit 1
@@ -52,7 +52,7 @@ then
 fi
 
 release=$(rpm -qp --queryformat '%{RELEASE}\n' "$pkgDir/$rpmName")
-if [ -z "$(echo "$release" | grep '^\([0-9]\{12\}\.[0-9a-f]\{7\}\|[0-9]\{10\}\)$')" ]
+if [ -z "$(echo "$release" | grep '^\([0-9]\{12\}\.git[0-9a-f]\{7\}\|[0-9]\{10\}\)$')" ]
 then
   echo "Release $release does not match our expected format"
   exit 1
@@ -67,7 +67,7 @@ then
 fi
 
 contents=$(rpm -qpl "$pkgDir/$rpmName")
-if [ -z "$(echo "$contents" | grep '/opt/pantheon/drush-[0-9]/drush')" ]
+if [ -z "$(echo "$contents" | grep '/opt/pantheon/drush[0-9]/drush')" ]
 then
   echo "RPM contents not correct"
   exit 1

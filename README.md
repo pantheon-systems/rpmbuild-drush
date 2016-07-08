@@ -4,13 +4,14 @@ This repository builds RPMs for drush.
 
 The RPM filenames built by this repository are formatted:
 ```
-drush-8.x-release-8.1.2-201607071503.df43fcf.x86_64.rpm
-{  name }-{type}-{vers}-{iteration}.{commit}.{arch}.rpm
+drush8-8.1.2-201607081150.gitc14c267.noarch.rpm
+{name}-{vers}-{iteration}.{commit}.{arch}.rpm
 ```
 The iteration number is the Circle build number for official builds, and a timestamp (seconds since the epoch) for locally-produced builds. The build script will refuse to make an RPM when there are uncommitted changes to the working tree, since the commit hash is included in the RPM name.
 
 This rpm installs:
 
+https://github.com/pantheon-systems/drush.git
 https://github.com/drush-ops/drush.git
 
 ## Picking drush versions

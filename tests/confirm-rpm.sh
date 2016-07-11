@@ -38,12 +38,6 @@ then
   exit 1
 fi
 
-if [ "$name" == "$expectedName" ]
-then
-  echo "Name does not have channel (dev, prod, etc.) appended."
-  exit 1
-fi
-
 epoch=$(rpm -qp --queryformat '%{EPOCH}\n' "$pkgDir/$rpmName")
 if [ -z "$(echo "$epoch" | grep '^[0-9]\{10\}$')" ]
 then

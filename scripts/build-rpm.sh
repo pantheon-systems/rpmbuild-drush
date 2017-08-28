@@ -78,6 +78,25 @@ for version in $versions; do(
 
 	[ -f composer.json ] && composer install
 
+	# For Drush 5 only, install external Drush extensions to
+	# /opt/pantheon/drush5/commands. In general, we want to put
+	# extensions in a different RPM from the main executable (Drush);
+	# however, in this case, these extensions are legacy support only.
+	# We do not expect to update the versions hereafter.
+	# Note that `commands` is the legacy location Pantheon used to
+	# install extensions in Drush 5.
+	if [ $releasenum -le "5" ]
+	then
+	  drush5="$download_dir/drush"
+	  drush5_external_extensions="$download_dir/commands"
+	  mkdir -p "$drush5_external_extensions"
+		$drush5 dl --package-handler=git_drupalorg -y --destination="$drush5_external_extensions" --default-major=6 drush_make
+		$drush5 dl --package-handler=git_drupalorg -y --destination="$drush5_external_extensions" --default-major=7 registry_rebuild-7.x-2.3
+		$drush5 dl --package-handler=git_drupalorg -y --destination="$drush5_external_extensions" --default-major=7 site_audit-7.x-1.10
+		# Allegedly this directory is necessary
+	  mkdir -p "$download_dir/aliases"
+	fi
+
 	cd -
 
 	mkdir -p "$target_dir"

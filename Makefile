@@ -1,5 +1,3 @@
-# Read the version we are packaging from VERSIONS.txt
-VERSION := $(shell cat VERSIONS.txt)
 
 all: clean rpm
 

@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/pantheon-systems/rpmbuild-drush.svg?style=shield&circle-token=b9c165d096a71c8fcf9586c251f7ec247b49991d)](https://circleci.com/gh/pantheon-systems/rpmbuild-drush)
+[![CircleCI](https://circleci.com/gh/pantheon-systems/rpmbuild-drush.svg?style=shield)](https://circleci.com/gh/pantheon-systems/rpmbuild-drush)
 
 # RPMs for Drush
 

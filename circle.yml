@@ -3,7 +3,7 @@ machine:
   php:
     version: 7.0.4
   ruby:
-    version: 2.0.0
+    version: 2.2.3
 
 dependencies:
   pre:
@@ -17,9 +17,7 @@ test:
 deployment:
   dev:
     branch:
-      - stage
-      - yolo
-      - dev
+      - /^(?!master$).*$/  # not the master branch
     commands:
       - bash scripts/push_packagecloud.sh internal-staging
   prod:

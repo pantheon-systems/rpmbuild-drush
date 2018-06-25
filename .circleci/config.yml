@@ -37,7 +37,7 @@ jobs:
       - run: echo 'export PATH=/rpmbuild/bin:$PATH' >> $BASH_ENV
       - run:
           name: Build PHP RPMs
-          command: make all
+          command: make package
           no_output_timeout: 4h
       - persist_to_workspace:
           root: /rpmbuild

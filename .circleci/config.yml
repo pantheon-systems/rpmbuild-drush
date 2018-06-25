@@ -16,7 +16,8 @@ jobs:
     <<: *rpmbuild_container
     steps:
       - checkout
-      - run: echo 'export PATH=/rpmbuild/bin:$PATH' >> $BASH_ENV
+      - run: echo 'export PATH=/rpmbuild/bin:$HOME/bin:$PATH' >> $BASH_ENV
+      - run: bash scripts/install-composer.sh
       - run:
           name: Build PHP RPMs
           command: make all

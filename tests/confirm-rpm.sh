@@ -1,6 +1,8 @@
 #!/bin/bash
 # confirm-rpm.sh
 
+set -eo pipefail
+
 drush_version=$1
 
 expectedName=drush
@@ -46,7 +48,7 @@ then
 fi
 
 release=$(rpm -qp --queryformat '%{RELEASE}\n' "$pkgDir/$rpmName")
-if [ -z "$(echo "$release" | grep '^\([0-9]\{12\}\.git[0-9a-f]\{7\}\|[0-9]\{10\}\)$')" ]
+if [ -z "$(echo "$release" | grep '^\([0-9]\{12\}\)\(\.git[0-9a-f]\{7\}\|[0-9]\{10\}|.dev|\)$')" ]
 then
   echo "Release $release does not match our expected format"
   exit 1

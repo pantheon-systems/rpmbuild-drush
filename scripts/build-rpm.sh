@@ -35,22 +35,17 @@ for version_with_datecode in $versions; do(
 	download_dir="$bin/../builds/$name"
 	target_dir="$bin/../pkgs/$name"
 
-	# Add the git SHA hash to the rpm build if the local working copy is clean
-	if [ -z "$(git diff-index --quiet HEAD --)" ]
+	if [ "$CHANNEL" == "dev" ]
 	then
-		GITSHA=$(git log -1 --format="%h")
-		iteration=${iteration}.git${GITSHA}
-	else
-		# Allow non-clean builds in dev mode; for anything else, fail if there
-		# are uncommitted changes.
-		if [ "$CHANNEL" != "dev" ]
+		# Add the git SHA hash to the rpm build if the local working copy is clean
+		if [ -z "$(git diff-index --quiet HEAD --)" ]
 		then
-			echo >&2
-			echo "Error: uncommitted changes present. Please commit to continue." >&2
-			echo "Git commithash is included in rpm, so working tree must be clean to build." >&2
-			exit 1
+			GITSHA=$(git log -1 --format="%h")
+			iteration=${iteration}.git${GITSHA}
+		else
+			iteration=${iteration}.dev
 		fi
-	fi
+  fi
 
 	mkdir -p "$target_dir"
 

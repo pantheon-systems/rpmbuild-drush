@@ -23,7 +23,7 @@ jobs:
       - run: echo 'export PATH=/rpmbuild/bin:$PATH' >> $BASH_ENV
       - run: bash scripts/fetch.sh
       - persist_to_workspace:
-          root: /root/rpmbuild
+          root: /rpmbuild
           paths:
             - builds
 
@@ -40,11 +40,11 @@ jobs:
           command: make all
           no_output_timeout: 4h
       - persist_to_workspace:
-          root: /root/rpmbuild
+          root: /rpmbuild
           paths:
             - pkgs
       - store_artifacts:
-          path: /root/rpmbuild/pkgs
+          path: /rpmbuild/pkgs
       - store_artifacts:
           path: /rpmbuild/logs
 

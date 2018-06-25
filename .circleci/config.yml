@@ -1,5 +1,9 @@
 ---
 defaults:
+  php_container: &php_container
+    docker:
+      - image: drupaldocker/php:7.1-cli
+    working_directory: /rpmbuild
   rpmbuild_container: &rpmbuild_container
     docker:
       - image: quay.io/getpantheon/rpmbuild-fedora:22
@@ -11,13 +15,26 @@ defaults:
 
 version: 2
 jobs:
+  # Download Drush and its dependencies
+  fetch:
+    <<: *php_container
+    steps:
+      - checkout
+      - run: echo 'export PATH=/rpmbuild/bin:$PATH' >> $BASH_ENV
+      - run: bash scripts/fetch.sh
+      - persist_to_workspace:
+          root: /root/rpmbuild
+          paths:
+            - builds
+
   # Build and test the RPM
   build:
     <<: *rpmbuild_container
     steps:
       - checkout
-      - run: echo 'export PATH=/rpmbuild/bin:$HOME/bin:$PATH' >> $BASH_ENV
-      - run: bash scripts/install-composer.sh
+      - attach_workspace:
+          at: /rpmbuild
+      - run: echo 'export PATH=/rpmbuild/bin:$PATH' >> $BASH_ENV
       - run:
           name: Build PHP RPMs
           command: make all
@@ -49,13 +66,16 @@ jobs:
       - attach_workspace:
           at: /rpmbuild
       - run: echo 'export PATH=/rpmbuild/bin:$PATH' >> $BASH_ENV
-      - run: bash scripts/push_packagecloud.sh internal
+      - run: bash scripts/promote_packagecloud.sh internal-staging internal
 
 workflows:
   version: 2
   build-test-publish-promote:
     jobs:
-      - build
+      - fetch
+      - build:
+          requires:
+            - fetch
       - publish:
           requires:
             - build

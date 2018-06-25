@@ -18,7 +18,9 @@ https://github.com/drush-ops/drush.git (Drush versions 7 and 8)
 
 ## Picking drush versions
 
-To specify drush versions to build, add to or comment out versions listed in VERSIONS.txt. For the convenience of future reference, please do not delete versions. Commenting them out will be sufficient to exclude them from the build script.
+To specify drush versions to build, add to or comment out versions listed in VERSIONS.txt. Each entry in VERSIONS.txt should contain the Drush version to build and a datecode, separated by a ":". For the datacode, simply enter the current YYYYMMDDHHmm.
+
+For the convenience of future reference, please do not delete versions. Commenting them out will be sufficient to exclude them from the build script.
 
 ALWAYS COMMENT OUT ANY VERSION NUMBER THAT IS NOT CHANGING.  This will prevent the creation of additional redundant RPMs on PackageCloud.
 

@@ -8,7 +8,7 @@ pkgDir="pkgs/$drush_version"
 
 if [ ! -d "$pkgDir" ]
 then
-  echo 'Package directory not found.'
+  echo "Package directory $pkgDir not found."
   exit 1
 fi
 

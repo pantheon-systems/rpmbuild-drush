@@ -14,7 +14,12 @@ deps-circle:
 	sudo apt-get -y install rpm
 	# gem install package_cloud
 
-rpm:
+rpm: fetch package
+
+fetch:
+	bash scripts/fetch.sh
+
+package:
 	bash scripts/build-rpm.sh
 
 clean:

@@ -10,10 +10,6 @@ deps:
 deps-macos:
 	brew install rpm
 
-deps-circle:
-	sudo apt-get -y install rpm
-	# gem install package_cloud
-
 rpm: fetch package
 
 fetch:

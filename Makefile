@@ -1,7 +1,7 @@
 
 all: clean rpm
 
-test: deps
+test:
 	tests/confirm-rpm.sh
 
 deps:
@@ -12,7 +12,7 @@ deps-macos:
 
 deps-circle:
 	sudo apt-get -y install rpm
-	gem install package_cloud
+	# gem install package_cloud
 
 rpm:
 	bash scripts/build-rpm.sh

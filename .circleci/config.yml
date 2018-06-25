@@ -1,0 +1,71 @@
+---
+defaults:
+  rpmbuild_container: &rpmbuild_container
+    docker:
+      - image: quay.io/getpantheon/rpmbuild-fedora:22
+    working_directory: /rpmbuild
+  packagecloud_container: &packagecloud_container
+    docker:
+      - image: quay.io/getpantheon/packagecloud:latest
+    working_directory: /rpmbuild
+
+version: 2
+jobs:
+  # Build and test the RPM
+  build:
+    <<: *rpmbuild_container
+    steps:
+      - checkout
+      - run: echo 'export PATH=/rpmbuild/bin:$PATH' >> $BASH_ENV
+      - run:
+          name: Build PHP RPMs
+          command: make all
+          no_output_timeout: 4h
+      - persist_to_workspace:
+          root: /root/rpmbuild
+          paths:
+            - pkgs
+      - store_artifacts:
+          path: /root/rpmbuild/pkgs
+      - store_artifacts:
+          path: /rpmbuild/logs
+
+  # Publish the RPM
+  publish:
+    <<: *packagecloud_container
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /rpmbuild
+      - run: echo 'export PATH=/rpmbuild/bin:$PATH' >> $BASH_ENV
+      - run: bash scripts/push_packagecloud.sh internal-staging
+
+  # Promote the RPM
+  promote:
+    <<: *packagecloud_container
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /rpmbuild
+      - run: echo 'export PATH=/rpmbuild/bin:$PATH' >> $BASH_ENV
+      - run: bash scripts/push_packagecloud.sh internal
+
+workflows:
+  version: 2
+  build-test-publish-promote:
+    jobs:
+      - build
+      - publish:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - /^(?!master$).*$/  # not the master branch
+      - promote:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - master

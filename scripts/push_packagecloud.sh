@@ -17,6 +17,7 @@ if [ -z "$1" ] ; then
 fi
 
 versions=$(cat $bin/../VERSIONS.txt | grep -v '^#')
+shortname=drush
 arch=noarch
 
 for version_with_datecode in $versions; do(

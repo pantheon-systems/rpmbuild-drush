@@ -3,26 +3,14 @@
 set -ex
 bin="$(cd -P -- "$(dirname -- "$0")" && pwd -P)"
 
-# set a default build -> 0 for when it doesn't exist
-CIRCLE_BUILD_NUM=${CIRCLE_BUILD_NUM:-0}
+# Set "channel" to "dev" for non-Circle builds, and "release" for Circle builds
+CHANNEL="dev"
+if [ -n "$CIRCLECI" ] ; then
+	CHANNEL="release"
+fi
 
 # epoch to use for -revision
 epoch=$(date +%s)
-
-case $CIRCLE_BRANCH in
-"master")
-	CHANNEL="release"
-	;;
-"stage")
-	CHANNEL="stage"
-	;;
-"yolo")
-	CHANNEL="yolo"
-	;;
-*)
-	CHANNEL="dev"
-	;;
-esac
 
 shortname="drush"
 arch='noarch'

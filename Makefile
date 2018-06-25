@@ -1,7 +1,7 @@
 
 all: clean rpm
 
-test: deps
+test:
 	tests/confirm-rpm.sh
 
 deps:
@@ -10,11 +10,12 @@ deps:
 deps-macos:
 	brew install rpm
 
-deps-circle:
-	sudo apt-get -y install rpm
-	gem install package_cloud
+rpm: fetch package
 
-rpm:
+fetch:
+	bash scripts/fetch.sh
+
+package:
 	bash scripts/build-rpm.sh
 
 clean:

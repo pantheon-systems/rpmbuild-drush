@@ -11,10 +11,13 @@ if [ -z "$(which package_cloud)" ]; then
   exit 1
 fi
 
-if [ -z "$1" ] ; then
-  echo "Need to specify target repo: internal, internal-staging"
+if [ -z "$1" ] || [ -z "$2" ] ; then
+  echo "Need to specify source and target repos, e.g. internal-staging internal"
   exit 1
 fi
+
+promote_from=$1
+promote_to=$2
 
 versions=$(cat $bin/../VERSIONS.txt | grep -v '^#')
 shortname=drush
@@ -37,7 +40,7 @@ for version_with_datecode in $versions; do(
   rpm_name=${name}-${version}-${iteration}.${arch}.rpm
 
   for fedora_version in ${repo_versions[@]} ; do
-    package_cloud push "pantheon/$1/fedora/$fedora_version" $target_dir/$rpm_name
+    package_cloud promote "pantheon/${promote_from}/fedora/${fedora_version}" "$rpm_name" "pantheon/${promote_to}"
   done
 
 )done

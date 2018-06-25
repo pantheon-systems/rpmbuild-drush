@@ -29,7 +29,6 @@ for version_with_datecode in $versions; do(
 
   releasenum=${version%%.*}
   name="$shortname$releasenum"
-  #iteration="$(date +%Y%m%d%H%M)"
   url="https://github.com/pantheon-systems/${shortname}"
   install_prefix="/opt/pantheon/$name"
   download_dir="$bin/../builds/$name"

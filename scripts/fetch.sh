@@ -77,7 +77,11 @@ for version_with_datecode in $versions; do(
   cd $download_dir
   git checkout $version_untampered
 
-  [ -f composer.json ] && composer install
+  # If there is a composer.json, then run composer install
+  [ ! -f composer.json ] || composer install --prefer-dist --no-dev --ignore-platform-reqs --optimize-autoloader
+
+  # If there is a SUT, remove it
+  [ ! -d sut ] || rm -rf sut
 
   # For Drush 5 only, install external Drush extensions to
   # /opt/pantheon/drush5/commands. In general, we want to put

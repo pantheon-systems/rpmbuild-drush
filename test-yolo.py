@@ -40,6 +40,8 @@ commandPrefix = "terminus drush "
 
 
 class EnvCacheClearTestCase(unittest.TestCase):
+    # terminus env:clear-cache
+    #
     # Confirm that using the command "terminus env:clear-cache" really does clear the cache by 
     # confirming that the test page gets cached and has a non-zero age, 
     # then running the command and confirming that the age is now 0 (the page has been reset/re-cached)
@@ -64,6 +66,8 @@ class EnvCacheClearTestCase(unittest.TestCase):
         assert int(header.headers['Age']) == 0
 
 class CronTestCase(unittest.TestCase):
+    # cron
+    #
     # Confirm that the command "terminus drush cron" succeeds.
     def command(self):
         return commandPrefix + siteName + ".dev" + " cron"
@@ -80,6 +84,8 @@ class CronTestCase(unittest.TestCase):
 
 
 class SiteAuditTestCase(unittest.TestCase):
+    # site audit / launch check
+    #
     # Comfirm that the command "terminus drush aa" successfully runs the site audit tests
     def command(self):
         return commandPrefix + siteName + ".dev" + " aa"
@@ -97,6 +103,8 @@ class SiteAuditTestCase(unittest.TestCase):
         assert "Watchdog" in result
 
 class UpdateTestCase(unittest.TestCase):
+    # update.php on env deploy/clone
+    #
     # Comfirm that commands "terminus env:deploy --updatedb" and "terminus env:clone" successfully perform updates on the database if needed. 
     # Tested by setting up a fixture site with an old version of a module (easy_breadcrumb) that requires a database updates, then performing the code update and 
     # deploying/cloning to the test environment and checking to confirm that no more database updates are required (implying that the database has been updated)
@@ -226,47 +234,39 @@ class UpdateTestCase(unittest.TestCase):
 
 
 class CacheClearTestCase(unittest.TestCase):
+    # cache clear on deploy/clone
+    #
     # confirm that the commands "terminus env:deploy --cc" and "terminus env:clone --cc" sucessfully clear the cache by checking 
     # that the AGE header is not zero when the site is initially cached during a GET request, then running the commands with the cache clear
     # flag, then confirming that the AGE is reset to 0 (implying that the cache was cleared)
-    def makeMultidev(self):
-        command = shlex.split("terminus multidev:create %s.dev temp" % siteName)
-        subprocess.call(command)
-        command = shlex.split("terminus --yes multidev:merge-from-dev --updatedb %s.temp" % siteName)
-        subprocess.check_output(command)
 
     #note: I think env:deploy --cc doesn't actually clear the cache (looking at workflows doesn't show a cache clearing workflow happening)
     @unittest.skip("Known bug: env:deploy does not clear the cache")
     def testCacheClearOnDeploy():
-        makeMultidev()
-        url = "http://temp-%s.pantheonsite.io/" % siteName
+        url = "http://test-%s.pantheonsite.io/" % siteName
         header = requests.get(url)
         time.sleep(5)
         header = requests.get(url)
         assert header.headers['Age'] != 0
-        command = shlex.split("terminus env:deploy --cc %s.temp" % siteName)
+        command = shlex.split("terminus env:deploy --cc %s.test" % siteName)
         subprocess.check_output(command)
         header = requests.get(url)
         assert header.headers['Age'] == 0
-        command = shlex.split("terminus --yes multidev:delete %s.temp" % siteName)
-        subprocess.check_output(command)
 
-    @unittest.skip("Known bug causing appearance of multiple AGE headers: BUGS-2628")
     def testCacheClearOnClone(self):
         print("testCacheClearOnClone")
-        self.makeMultidev()
-        url = "http://temp-%s.pantheonsite.io/" % siteName
+        url = "http://test-%s.pantheonsite.io/" % siteName
         header = requests.get(url)
         time.sleep(5)
         header = requests.get(url)
-        command = shlex.split("terminus --yes env:clone --cc %s.dev temp" % siteName)
+        command = shlex.split("terminus --yes env:clone --cc %s.dev test" % siteName)
         subprocess.check_output(command)
         header = requests.get(url)
         assert int(header.headers['Age']) == 0
-        command = shlex.split("terminus --yes multidev:delete %s.temp" % siteName)
-        subprocess.check_output(command)
 
 class DrupalAdminLoginLinkTestCase(unittest.TestCase):
+    # CSE debug Drupal admin login link
+    #
     # confirm that the command "terminus drush uli" successfully produces a login URL. Note that this doesn't confirm that the login URL 
     # is correct/works, just that the command works. 
     def command(self):

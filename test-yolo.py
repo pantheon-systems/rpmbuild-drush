@@ -125,6 +125,7 @@ class UpdateTestCase(unittest.TestCase):
         subprocess.check_output(command)
         command = shlex.split("terminus --yes connection:set %s.dev sftp" % siteName)
         subprocess.call(command)
+        os.chdir(curr)
         command = shlex.split("rm -rf %s" % siteName)
         subprocess.call(command)
 
@@ -279,7 +280,7 @@ class DrupalAdminLoginLinkTestCase(unittest.TestCase):
 
     def testDrupalAdminLoginLink(self):
         loginLink = self.getCommandResult()
-        assert "http://" in loginLink
+        assert "http" in loginLink
 
 
 if __name__ == "__main__":

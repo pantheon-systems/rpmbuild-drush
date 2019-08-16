@@ -170,7 +170,7 @@ class UpdateTestCase(unittest.TestCase):
 
         # test that deploy caused updates
         command = shlex.split("terminus drush %s.test updatedb" % siteName)
-        err2 = subprocess.check_output(command, stderr=subprocess.STDOUT)
+        test2, err2 = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
         assert "No database updates required" in err2
 
         #reset to original state
@@ -214,7 +214,6 @@ class UpdateTestCase(unittest.TestCase):
         # check that database updates are needed
         command = shlex.split("terminus drush -- %s.test updatedb -n" % siteName)
         test1, err1 = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-        print(test1)
         assert "updates" in test1
         assert "pending" in test1
         

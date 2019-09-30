@@ -63,7 +63,7 @@ then
 fi
 
 contents=$(rpm -qpl "$pkgDir/$rpmName")
-if [ -z "$(echo "$contents" | grep '/opt/pantheon/drush[0-9]/drush')" ]
+if [ -z "$(echo "$contents" | grep '/opt/pantheon/drush[0-9][0-9]*/drush')" ]
 then
   echo "RPM contents not correct"
   exit 1

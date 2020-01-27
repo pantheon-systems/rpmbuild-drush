@@ -33,6 +33,11 @@ import shlex
 siteName = sys.argv[1]
 del sys.argv[1]
 
+envName = 'dev'
+if sys.argv[1].startswith('--env='):
+    envName = sys.argv[1][6:]
+    del sys.argv[1]
+
 commandPrefix = "terminus drush "
 
 # drupal7Site = "ci-drupal-7"
@@ -46,7 +51,7 @@ class EnvCacheClearTestCase(unittest.TestCase):
     # confirming that the test page gets cached and has a non-zero age, 
     # then running the command and confirming that the age is now 0 (the page has been reset/re-cached)
     def command(self):
-        return "terminus env:clear-cache " + siteName + ".dev"
+        return "terminus env:clear-cache " + siteName + "." + envName
 
     def getCommandResult(self):
         command = shlex.split(self.command())
@@ -70,7 +75,7 @@ class CronTestCase(unittest.TestCase):
     #
     # Confirm that the command "terminus drush cron" succeeds.
     def command(self):
-        return commandPrefix + siteName + ".dev" + " cron"
+        return commandPrefix + siteName + "." + envName + " cron"
 
     def getCommandResult(self):
         command = shlex.split(self.command())
@@ -80,7 +85,7 @@ class CronTestCase(unittest.TestCase):
     def testCron(self):
         print("testCron")
         result = self.getCommandResult()
-        assert "Cron run successful." in result
+        assert "Cron run completed." in result
 
 
 class SiteAuditTestCase(unittest.TestCase):
@@ -88,7 +93,7 @@ class SiteAuditTestCase(unittest.TestCase):
     #
     # Comfirm that the command "terminus drush aa" successfully runs the site audit tests
     def command(self):
-        return commandPrefix + siteName + ".dev" + " aa"
+        return commandPrefix + siteName + "." + envName + " aa"
 
     def getCommandResult(self):
         command = shlex.split(self.command())
@@ -132,6 +137,9 @@ class UpdateTestCase(unittest.TestCase):
 
     def testUpdateOnDeploy(self):
         print("testUpdateOnDeploy")
+        
+        if not siteName.startswith('ci-'):
+            self.skipTest('Skip destructive update-on-deploy test on non-CI site')
         
         # retreive local copy of the repo:
         command = shlex.split("terminus site:info %s --field=id" % siteName)
@@ -179,6 +187,9 @@ class UpdateTestCase(unittest.TestCase):
 
     def testUpdateOnClone(self):
         print("testUpdateOnClone")
+
+        if not siteName.startswith('ci-'):
+            self.skipTest('Skip destructive update-on-clone test on non-CI site')
         
         # retreive local copy of the dev repo:
         command = shlex.split("terminus site:info %s --field=id" % siteName)
@@ -259,7 +270,7 @@ class CacheClearTestCase(unittest.TestCase):
         header = requests.get(url)
         time.sleep(5)
         header = requests.get(url)
-        command = shlex.split("terminus --yes env:clone --cc %s.dev test" % siteName)
+        command = shlex.split("terminus --yes env:clone --cc %s.%s test" % (siteName, envName))
         subprocess.check_output(command)
         header = requests.get(url)
         assert int(header.headers['Age']) == 0
@@ -270,7 +281,7 @@ class DrupalAdminLoginLinkTestCase(unittest.TestCase):
     # confirm that the command "terminus drush uli" successfully produces a login URL. Note that this doesn't confirm that the login URL 
     # is correct/works, just that the command works. 
     def command(self):
-        return commandPrefix + siteName + ".dev" + " uli"
+        return commandPrefix + siteName + "." + envName + " uli"
 
     def getCommandResult(self):
         command = shlex.split(self.command())
